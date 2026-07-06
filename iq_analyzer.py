@@ -1,13 +1,14 @@
 import math
 import struct
 
-# the generated signals will be noiseless (Ideal Signal) 
+
 
 def analyzer(iq_samples, sample_rate):    
     prev_theta = 0
     signal =[]
+    analyzer_packet =[]
 
-    for sample in iq_samples:
+    for n, sample in enumerate(iq_samples):
 
         
         I = sample.real
@@ -28,27 +29,43 @@ def analyzer(iq_samples, sample_rate):
 
         frequency = (delta_theta / 360) * sample_rate  
 
-        signal.append({
+        signal.append({     
             "Amplitude": amplitude,
             "Theta": theta,
             "delta": delta_theta,
             "Frequency": frequency
         })
 
-        write_file(signal)    
+        analyzer_packet.append({
+            "n":n,    # temporary | for trace purpose only
+            "I":I,
+            "Q":Q,
+            "amplitude":amplitude,
+            "theta":theta,
+            "theta_deg":theta_deg,
+            "prev_theta":prev_theta,
+            "delta_theta":delta_theta,
+            "frequency":frequency,
+        })        
+
+    write_file(signal)  
+
+    return  analyzer_packet
 
 
-#|||||||||||**لازم اطبع عداد عشان احسب بعض العينات يدوياً واتاكد منها**|||||||||||
 
-def write_file(data, filename = "iq_output.txt"):
+
+def write_file(data, filename = "iq_output_final_result.txt"):
     with open(filename,"w") as f:
+        sample_len = 0
         for sample in data:
-
+            sample_len +=1
             f.write(
-                f"Amplitude={sample['Amplitude']:.3f}, "
-                f"Theta={sample['Theta']:.3f}, "
-                f"Delta Theta={sample['delta']:.3f}, "
-                f"Frequency={sample['Frequency']:.3f}Hz\n"
+                f"smaple number = {sample_len}, "
+                f"Amplitude ={sample['Amplitude']:.3f}, "
+                f"Theta ={sample['Theta']:.3f}, "
+                f"Delta Theta ={sample['delta']:.3f}, "
+                f"Frequency ={sample['Frequency']:.3f}Hz \n"
             )
 
     return filename
